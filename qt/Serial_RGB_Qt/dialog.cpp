@@ -14,7 +14,10 @@ Dialog::Dialog(QWidget *parent) :
 
     QSignalMapper *qSignalMapper = new QSignalMapper(this);
     qSignalMapper->setMapping(ui->pushButton, "1");
+    qSignalMapper->setMapping(ui->pushButtonBackword, "2");
+
     connect(ui->pushButton,SIGNAL(pressed()), qSignalMapper, SLOT(map()));
+    connect(ui->pushButtonBackword,SIGNAL(pressed()), qSignalMapper, SLOT(map()));
 
     connect(qSignalMapper, SIGNAL(mapped(QString)), this, SLOT(moveXForward(QString)));
 

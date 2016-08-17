@@ -2,8 +2,7 @@
 #include "axisDirectionStruct.h" //importing AxisAndDirection 
 
 int incomingByte = 0;   // for incoming serial data
-int stepsPerKeyStrock = 50;
-int speed = 10;
+int speed = 5;
 // The X Stepper pins
 #define STEPPER_DIR_PIN 3
 #define STEPPER_STEP_PIN 2
@@ -39,7 +38,7 @@ void loop()
 		//incoming data is stored in buffer. Serial.reads reads 1 byte from it. if not read, code under Serial.available will be executed with every spin cycle. 
 		incomingByte = Serial.parseInt();
 		AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
-
+		int stepsPerKeyStrock = 50;
 		if(axisAndDirection.axis == 'x') {
 			if(axisAndDirection.direction == -1) {
 				stepsPerKeyStrock = -stepsPerKeyStrock;
@@ -54,18 +53,13 @@ AxisAndDirection getAxisAndDirection(int incomingByte){
 	switch(incomingByte) {
 		case 1:
 			return {'x', 1};
-			break;
 		case 2:
 			return {'x', -1};
-			break;
 		case 3:
 			return {'y',1};
-			break; 
 		case 4:
 			return {'y',-1};
-			break; 
 		default:
 			return {'A',0};
-			break; 
 	}
 }
