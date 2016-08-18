@@ -38,7 +38,7 @@ void loop()
 		//incoming data is stored in buffer. Serial.reads reads 1 byte from it. if not read, code under Serial.available will be executed with every spin cycle. 
 		incomingByte = Serial.parseInt();
 		AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
-		int stepsPerKeyStrock = 50;
+		int stepsPerKeyStrock = 100;
 		if(axisAndDirection.axis == 'x') {
 			if(axisAndDirection.direction == -1) {
 				stepsPerKeyStrock = -stepsPerKeyStrock;
