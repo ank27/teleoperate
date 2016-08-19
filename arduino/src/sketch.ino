@@ -2,7 +2,7 @@
 #include "axisDirectionStruct.h" //importing AxisAndDirection 
 
 int incomingByte = 0;   // for incoming serial data
-int speed = 5;
+int speed = 10;
 // The X Stepper pins
 #define STEPPER_DIR_PIN 3
 #define STEPPER_STEP_PIN 2
