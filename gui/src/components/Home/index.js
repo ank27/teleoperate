@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
+
 import {Grid, Row, Col} from 'react-bootstrap'
 import FontAwesome from 'react-fontawesome'
 
@@ -45,9 +46,30 @@ const Rep = ({
 		)
 }
 
-const dispatchProps = ({
-	onKeyPress() {
-		console.log('heard this event')
+const dispatchProps = (dispatch) => ({
+	onKeyPress(e) {
+		let move = '';
+		switch(e.keyCode) {
+			case '38': //UP 
+				move = 'z+'
+				break
+			case '40': //DOWN
+				move = 'z-'
+				break
+			case '37': //LEFT
+				move = 'x+'
+				break
+			case '39': //RIGHT
+				move = 'x-'
+				break
+			default:
+				break
+		}
+		
+		if(move=='') 
+			return
+
+		dispatch({type: 'SET_AXIS_AND_DIRECTION', payload: move});
 	}
 })
 
