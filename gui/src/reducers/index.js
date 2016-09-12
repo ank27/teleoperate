@@ -1,4 +1,5 @@
-import temp from './temp'
+import axis from './axis'
+
 export default {
-	temp
+	axis
 }
