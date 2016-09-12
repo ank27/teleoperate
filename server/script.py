@@ -2,7 +2,8 @@ from flask import Flask
 from flask import request,render_template
 import serial
 import os
-app = Flask(__name__, template_folder='../gui')
+
+app = Flask(__name__, template_folder='../gui',static_folder='../gui',static_url_path='')
 app.debug=True
 
 @app.route('/')
