@@ -13,6 +13,7 @@ AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 void setup()
 {
 	Serial.begin(9600);
+  pinMode(13, OUTPUT);
 	stepper.setMaxSpeed(40);
 }
 
@@ -34,6 +35,11 @@ void blockingRunSpeedToPosition(long position)
 
 void loop()
 {
+  if (Serial.available()) {
+    digitalWrite(13, HIGH);     
+  }
+
+/*
 	if (Serial.available()){
 		//incoming data is stored in buffer. Serial.reads reads 1 byte from it. if not read, code under Serial.available will be executed with every spin cycle. 
 		incomingByte = Serial.parseInt();
@@ -47,6 +53,7 @@ void loop()
 			blockingRunSpeedToPosition(stepsPerKeyStrock);
 		}
 	}
+*/
 }
 
 AxisAndDirection getAxisAndDirection(int incomingByte){
