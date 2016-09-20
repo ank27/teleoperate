@@ -13,7 +13,7 @@ AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 void setup()
 {
 	Serial.begin(9600);
-  pinMode(13, OUTPUT);
+  	pinMode(13, OUTPUT);
 	stepper.setMaxSpeed(40);
 }
 
@@ -35,14 +35,14 @@ void blockingRunSpeedToPosition(long position)
 
 void loop()
 {
-  if (Serial.available()) {
-    digitalWrite(13, HIGH);     
-  }
+  // if (Serial.available()) {
+  //   digitalWrite(13, HIGH);     
+  // }
 
-/*
 	if (Serial.available()){
 		//incoming data is stored in buffer. Serial.reads reads 1 byte from it. if not read, code under Serial.available will be executed with every spin cycle. 
-		incomingByte = Serial.parseInt();
+		incomingByte = Serial.read();
+		printf("%s\n", incomingByte);
 		AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
 		int stepsPerKeyStrock = 100;
 		if(axisAndDirection.axis == 'x') {
@@ -53,19 +53,22 @@ void loop()
 			blockingRunSpeedToPosition(stepsPerKeyStrock);
 		}
 	}
-*/
 }
 
 AxisAndDirection getAxisAndDirection(int incomingByte){
 	switch(incomingByte) {
-		case 1:
+		case +x:
 			return {'x', 1};
-		case 2:
+		case -x:
 			return {'x', -1};
-		case 3:
+		case +y:
 			return {'y',1};
-		case 4:
+		case -y:
 			return {'y',-1};
+		case +z:
+			return {'z',1};
+		case -z:
+			return {'z',-1};
 		default:
 			return {'A',0};
 	}
