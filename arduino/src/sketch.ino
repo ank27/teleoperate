@@ -14,69 +14,69 @@ AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 
 void setup()
 {
-  Serial.begin(9600);
-  pinMode(led_pin, OUTPUT);
-  stepper.setMaxSpeed(40);
+    Serial.begin(9600);
+    pinMode(led_pin, OUTPUT);
+    stepper.setMaxSpeed(40);
 }
 
 void blockingRunSpeedToPosition(long position)
 {
-  /*
-     runSpeedToPosition is non blocking.
-     You must call this as frequently as possible, but at least once per step interval,		
-     But we want blocking so we have to implement own loop using while
-   */
+    /*
+       runSpeedToPosition is non blocking.
+       You must call this as frequently as possible, but at least once per step interval,		
+       But we want blocking so we have to implement own loop using while
+     */
 
-  stepper.setCurrentPosition(0);
+    stepper.setCurrentPosition(0);
 
-  ///stepper.moveTo function : Set the target position absolute to the current position
-  //  stepper.moveTo(position);
+    ///stepper.moveTo function : Set the target position absolute to the current position
+    //  stepper.moveTo(position);
 
-  ///stepper.move funtion : Set the target position relative to the current position
-  /// if position is negative then anticlockwise from the current position, else clockwise from current position
-  stepper.move(position);
-  stepper.setSpeed(speed);
-  while (stepper.distanceToGo() != 0)
-    stepper.runSpeedToPosition();
+    ///stepper.move funtion : Set the target position relative to the current position
+    /// if position is negative then anticlockwise from the current position, else clockwise from current position
+    stepper.move(position);
+    stepper.setSpeed(speed);
+    while (stepper.distanceToGo() != 0)
+        stepper.runSpeedToPosition();
 }
 
 
 void loop()
 {
-  while (Serial.available()==0) { }  //Wait for serial data
+    while (Serial.available()==0) { }  //Wait for serial data
 
-  incomingByte=Serial.readString();
-  incomingByte.trim();
+    incomingByte=Serial.readString();
+    incomingByte.trim();
 
-  Serial.println(incomingByte); //debugging
+    Serial.println(incomingByte); //debugging
 
-  AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
+    AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
 
-  int stepsPerKeyStrock = 200;
-  if(axisAndDirection.axis == 'x') {
-    digitalWrite(led_pin,HIGH);
-    if(axisAndDirection.direction == -1) {
-      stepsPerKeyStrock = -stepsPerKeyStrock;
+    int stepsPerKeyStrock = 200;
+    if(axisAndDirection.axis == 'x') {
+        digitalWrite(led_pin,HIGH);
+        if(axisAndDirection.direction == -1) {
+            stepsPerKeyStrock = -stepsPerKeyStrock;
+        }
+        blockingRunSpeedToPosition(stepsPerKeyStrock);
+    }else{
+        digitalWrite(led_pin,LOW);
     }
-    blockingRunSpeedToPosition(stepsPerKeyStrock);
-  }else{
-    digitalWrite(led_pin,LOW);
-  }
 }
 
 AxisAndDirection getAxisAndDirection(String data){
 
-  if(data.equals("x")){
-    return {'x', 1};
-  }else if(data.equals("x-")){
-    return {'x', -1};
-  }else if(data.equals("y")){
-    return {'y', 1};
-  }else if(data.equals("y-")){
-    return {'y', -1};
-  }else{
-    return{'A',0};
-  }
+    if(data.equals("x")){
+        return {'x', 1};
+    }else if(data.equals("x-")){
+        return {'x', -1};
+    }else if(data.equals("y")){
+        return {'y', 1};
+    }else if(data.equals("y-")){
+        return {'y', -1};
+    }else{
+        return{'A',0};
+    }
 }
 
 
