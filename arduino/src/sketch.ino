@@ -1,75 +1,82 @@
 #include "AccelStepper.h"
 #include "axisDirectionStruct.h" //importing AxisAndDirection 
 
-int incomingByte = 0;   // for incoming serial data
-int speed = 10;
+String incomingByte;   // for incoming serial data
+int speed = 20;
 // The X Stepper pins
-#define STEPPER_DIR_PIN 3
+#define STEPPER_DIR_PIN 10
 #define STEPPER_STEP_PIN 2
+#define led_pin 13
 
-// Define some stepper  and the pins the will use
+// Define some stepper and the pins the will use
+//AccelStepper::DRIVER means that we are using Driver, or we can write simply "1"
 AccelStepper stepper(AccelStepper::DRIVER, STEPPER_STEP_PIN, STEPPER_DIR_PIN);
 
 void setup()
 {
-	Serial.begin(9600);
-  	pinMode(13, OUTPUT);
-	stepper.setMaxSpeed(40);
+  Serial.begin(9600);
+  pinMode(led_pin, OUTPUT);
+  stepper.setMaxSpeed(40);
 }
 
 void blockingRunSpeedToPosition(long position)
 {
-	/*
-		runSpeedToPosition is non blocking.
-		You must call this as frequently as possible, but at least once per step interval,		
-		But we want blocking so we have to implement own loop using while
-	*/
+  /*
+     runSpeedToPosition is non blocking.
+     You must call this as frequently as possible, but at least once per step interval,		
+     But we want blocking so we have to implement own loop using while
+   */
 
-	stepper.setCurrentPosition(0);
-    stepper.moveTo(position);
-    stepper.setSpeed(speed);
-    while (stepper.distanceToGo() != 0)
-      stepper.runSpeedToPosition();
+  stepper.setCurrentPosition(0);
+
+  ///stepper.moveTo function : Set the target position absolute to the current position
+  //  stepper.moveTo(position);
+
+  ///stepper.move funtion : Set the target position relative to the current position
+  /// if position is negative then anticlockwise from the current position, else clockwise from current position
+  stepper.move(position);
+  stepper.setSpeed(speed);
+  while (stepper.distanceToGo() != 0)
+    stepper.runSpeedToPosition();
 }
 
 
 void loop()
 {
-  // if (Serial.available()) {
-  //   digitalWrite(13, HIGH);     
-  // }
+  while (Serial.available()==0) { }  //Wait for serial data
 
-	if (Serial.available()){
-		//incoming data is stored in buffer. Serial.reads reads 1 byte from it. if not read, code under Serial.available will be executed with every spin cycle. 
-		incomingByte = Serial.read();
-		printf("%s\n", incomingByte);
-		AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
-		int stepsPerKeyStrock = 100;
-		if(axisAndDirection.axis == 'x') {
-			if(axisAndDirection.direction == -1) {
-				stepsPerKeyStrock = -stepsPerKeyStrock;
-			}
+  incomingByte=Serial.readString();
+  incomingByte.trim();
 
-			blockingRunSpeedToPosition(stepsPerKeyStrock);
-		}
-	}
+  Serial.println(incomingByte); //debugging
+
+  AxisAndDirection axisAndDirection = getAxisAndDirection(incomingByte);
+
+  int stepsPerKeyStrock = 200;
+  if(axisAndDirection.axis == 'x') {
+    digitalWrite(led_pin,HIGH);
+    if(axisAndDirection.direction == -1) {
+      stepsPerKeyStrock = -stepsPerKeyStrock;
+    }
+    blockingRunSpeedToPosition(stepsPerKeyStrock);
+  }else{
+    digitalWrite(led_pin,LOW);
+  }
 }
 
-AxisAndDirection getAxisAndDirection(int incomingByte){
-	switch(incomingByte) {
-		case +x:
-			return {'x', 1};
-		case -x:
-			return {'x', -1};
-		case +y:
-			return {'y',1};
-		case -y:
-			return {'y',-1};
-		case +z:
-			return {'z',1};
-		case -z:
-			return {'z',-1};
-		default:
-			return {'A',0};
-	}
+AxisAndDirection getAxisAndDirection(String data){
+
+  if(data.equals("x")){
+    return {'x', 1};
+  }else if(data.equals("x-")){
+    return {'x', -1};
+  }else if(data.equals("y")){
+    return {'y', 1};
+  }else if(data.equals("y-")){
+    return {'y', -1};
+  }else{
+    return{'A',0};
+  }
 }
+
+
