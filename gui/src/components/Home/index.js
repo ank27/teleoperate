@@ -55,7 +55,11 @@ const dispatchProps = (dispatch) => ({
       case 39: //RIGHT
         move = 'x-'
         break
-      default:
+      case 34: //PAGEUP
+        move = 'y+'
+        break
+      case 33: //PAGE DOWN
+        move = 'y-'
         break
     }
 
@@ -70,6 +74,5 @@ const dispatchProps = (dispatch) => ({
       .end()
   }
 })
-
 export default connect(null, dispatchProps)(Rep)
 
