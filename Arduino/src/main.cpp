@@ -1,3 +1,6 @@
+#include <AccelStepper.h>
+#include <MultiStepper.h>
+
 #include <Arduino.h>
 #include "AccelStepper.h"
 #include "MultiStepper.h"
@@ -10,7 +13,9 @@
 
 #define STEPPER_Y_STEP_PIN 9
 #define STEPPER_Y_DIR_PIN 10
+#define enable_x 5
 #define led_pin 13
+#define goodToGoX_pin 11
 enum Direction { FORWARD, BACKWORD } direction;
 
 String inputString = "";         // a string to hold incoming data
@@ -28,6 +33,8 @@ void setup()
 {
   Serial.begin(9600);
   pinMode(led_pin, OUTPUT);
+  pinMode(goodToGoX_pin,INPUT);
+  pinMode(enable_x, OUTPUT);
   stepperX.setMaxSpeed(200.0);
   stepperX.setAcceleration(100);
 
@@ -39,11 +46,18 @@ void setup()
 
   steppers.addStepper(stepperY);
   steppers.addStepper(stepperZ);
+  digitalWrite(enable_x, HIGH);
 }
 
 void loop()
 {
-  // print the string when a newline arrives:
+  int reading=digitalRead(goodToGoX_pin);
+  if(reading==HIGH){
+    digitalWrite(led_pin,HIGH);
+   }else{
+    digitalWrite(led_pin,LOW);
+   }
+  
   if (stringComplete) {
       Serial.println(inputString);
       // clear the string:
@@ -68,11 +82,8 @@ void loop()
           direction = BACKWORD;
           blockingRunSpeedToPosition(direction, "z");
       }
-
-      inputString = "";
-      stringComplete = false;
-
     }
+
 }
 
 /*
@@ -91,6 +102,7 @@ void loop()
     // so the main loop can do something about it:
     if (inChar == '\n') {
       stringComplete = true;
+      digitalWrite(enable_x,HIGH);
     }
   }
 }
@@ -102,17 +114,21 @@ void blockingRunSpeedToPosition(int direction, String axis)
      You must call this as frequently as possible, but at least once per step interval,
      But we want blocking so we have to implement own loop using while
    */
+   
+
    Serial.println("got "+axis);
-   int steps = 1600;
+   int goodToGoX_status;
+   int steps = 1200;
    if(direction == BACKWORD) {
        steps = -steps;
    }
+   goodToGoX_status=digitalRead(goodToGoX_pin);
    ///stepper.move funtion : Set the target position relative to the current position
    /// if position is negative then anticlockwise from the current position, else clockwise from current position
    if(axis.equals("x")){
        stepperX.setCurrentPosition(0);
        stepperX.move(steps);
-       while (stepperX.distanceToGo() != 0) {
+       while (stepperX.distanceToGo() != 0 && goodToGoX_status==HIGH) {
            stepperX.run();
         }
     }else if (axis.equals("y")) {
@@ -140,4 +156,7 @@ void blockingRunSpeedToPosition(int direction, String axis)
         //     steppers.run();
         // }
     }
+    inputString = "";
+    stringComplete = false;
+    digitalWrite(enable_x, LOW);
 }
